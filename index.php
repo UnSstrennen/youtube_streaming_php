@@ -32,9 +32,11 @@ if (isset($_POST['insert_yt_broadcast'])) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
     $result = json_decode(curl_exec($ch), true);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if (curl_errno($ch)) {
-         echo 'Error:' . curl_error($ch);
+        echo 'Error: ' . curl_error($ch);
     }
+    elseif (isset($result['error'])) echo 'Error: ' . $result['error']['message'];
     else {
         echo 'Success!  ';
         // if it dowsn't echo any ID, then cookie has been removed or broadcast was planned for a past time
