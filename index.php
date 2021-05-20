@@ -22,6 +22,7 @@ if (isset($_POST['insert_yt_broadcast'])) {
     curl_setopt($ch, CURLOPT_URL, 'https://youtube.googleapis.com/youtube/v3/liveBroadcasts?part=status&part=snippet&key=' . $_COOKIE['access_token']);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_HEADER, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
     curl_setopt($ch, CURLOPT_ENCODING, 'gzip, deflate');
 
@@ -33,9 +34,8 @@ if (isset($_POST['insert_yt_broadcast'])) {
 
     $result = json_decode(curl_exec($ch), true);
     $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if (curl_errno($ch)) {
-        echo 'Error: ' . curl_error($ch);
-    }
+    if (curl_errno($ch)) echo 'Error: ' . curl_error($ch);
+    elseif ($httpcode == 403) header('Location: https://studio.youtube.com/channel/UC/livestreaming');
     elseif (isset($result['error'])) echo 'Error: ' . $result['error']['message'];
     else {
         echo 'Success!  ';
@@ -46,7 +46,7 @@ if (isset($_POST['insert_yt_broadcast'])) {
 }
 
 // auth handler. There's nothing to change because auth process is strictly standardised
-else if (!isset($_COOKIE['access_token'])) {
+elseif (!isset($_COOKIE['access_token'])) {
     // auth, nothing interesting
     // step 2
     $headers = array();
